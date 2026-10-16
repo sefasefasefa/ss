@@ -33,7 +33,18 @@ jobs:
         run: toolchain build python3 kivy
 
       - name: Generate Xcode project
-        run: toolchain create ZONE "$GITHUB_WORKSPACE"
+        run: |
+          APP_SOURCE="$RUNNER_TEMP/zone_app"
+          mkdir -p "$APP_SOURCE"
+          rsync -a \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='build/' \
+            --exclude='dist/' \
+            --exclude='zone-ios/' \
+            --exclude='__pycache__/' \
+            "$GITHUB_WORKSPACE/" "$APP_SOURCE/"
+          toolchain create zone "$APP_SOURCE"
 
       - name: Build unsigned iPhone app
         run: |
@@ -43,7 +54,8 @@ jobs:
             -sdk iphoneos \
             -configuration Release \
             -destination 'generic/platform=iOS' \
-            -derivedDataPath "$GITHUB_WORKSPACE/build/DerivedData" \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            IPHONEOS_DEPLOYMENT_TARGET=12.0 \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY= \
@@ -51,7 +63,7 @@ jobs:
 
       - name: Package unsigned IPA
         run: |
-          APP_PATH="$GITHUB_WORKSPACE/build/DerivedData/Build/Products/Release-iphoneos/zone.app"
+          APP_PATH="$RUNNER_TEMP/DerivedData/Build/Products/Release-iphoneos/zone.app"
           test -d "$APP_PATH"
           mkdir -p "$GITHUB_WORKSPACE/build/Payload"
           cp -R "$APP_PATH" "$GITHUB_WORKSPACE/build/Payload/zone.app"
