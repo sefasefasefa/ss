@@ -38,8 +38,8 @@ jobs:
       - name: Build unsigned iPhone app
         run: |
           xcodebuild \
-            -project "$GITHUB_WORKSPACE/ZONE-ios/ZONE.xcodeproj" \
-            -scheme ZONE \
+            -project "$GITHUB_WORKSPACE/zone-ios/zone.xcodeproj" \
+            -scheme zone \
             -sdk iphoneos \
             -configuration Release \
             -destination 'generic/platform=iOS' \
@@ -51,10 +51,10 @@ jobs:
 
       - name: Package unsigned IPA
         run: |
-          APP_PATH="$GITHUB_WORKSPACE/build/DerivedData/Build/Products/Release-iphoneos/ZONE.app"
+          APP_PATH="$GITHUB_WORKSPACE/build/DerivedData/Build/Products/Release-iphoneos/zone.app"
           test -d "$APP_PATH"
           mkdir -p "$GITHUB_WORKSPACE/build/Payload"
-          cp -R "$APP_PATH" "$GITHUB_WORKSPACE/build/Payload/ZONE.app"
+          cp -R "$APP_PATH" "$GITHUB_WORKSPACE/build/Payload/zone.app"
           cd "$GITHUB_WORKSPACE/build"
           /usr/bin/zip -qr "$GITHUB_WORKSPACE/build/ZONE-unsigned.ipa" Payload
 
